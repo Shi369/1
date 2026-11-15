@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5fbf7" />
+    <meta name="description" content="MD轻页，一款为手机而生的轻量 Markdown 编辑器。" />
+    <title>MD轻页｜轻量 Markdown 编辑器</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=ZCOOL+XiaoWei&display=swap');
+
+      :root {
+        font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: #17342b;
+        background: #f7fcf8;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        --ink: #17342b;
+        --muted: #6c847a;
+        --green: #4b9d70;
+        --green-dark: #2f7650;
+        --line: #dcebe2;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; min-width: 320px; }
+      a { color: inherit; text-decoration: none; }
+
+      .page-shell { position: relative; min-height: 100vh; overflow: hidden; background: #f3faf5; isolation: isolate; }
+      .page-shell::before { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 78% 10%, rgba(190, 229, 201, .7), transparent 28%), radial-gradient(circle at 10% 64%, rgba(216, 240, 222, .88), transparent 30%), linear-gradient(135deg, #ffffff 0%, #f4fbf6 45%, #e7f5eb 100%); content: ''; }
+      .ambient { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(2px); }
+      .ambient-one { width: 520px; height: 520px; right: -210px; top: -220px; background: rgba(188, 231, 201, .34); }
+      .ambient-two { width: 360px; height: 360px; left: -230px; top: 55%; background: rgba(221, 243, 226, .5); }
+
+      .topbar, .hero, .intro-section, .footer { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; padding: 30px 40px; }
+      .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; letter-spacing: .04em; }
+      .brand-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; color: white; background: var(--green); font-family: Georgia, serif; font-size: 19px; font-style: italic; box-shadow: 0 5px 14px rgba(75, 157, 112, .25); }
+      .topbar-note { color: var(--muted); font-size: 13px; }
+
+      .hero { display: grid; grid-template-columns: 1.04fr .96fr; align-items: center; gap: 60px; min-height: 590px; padding: 72px 40px 100px; }
+      .eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 24px; color: var(--green-dark); font-size: 12px; font-weight: 700; letter-spacing: .16em; }
+      .eyebrow-dot { width: 8px; height: 8px; border-radius: 50%; background: #68b884; box-shadow: 0 0 0 5px rgba(104, 184, 132, .14); }
+      h1, h2 { margin: 0; color: var(--ink); letter-spacing: -.055em; line-height: 1.15; }
+      h1 { font-size: clamp(42px, 6vw, 73px); font-weight: 700; }
+      h1 em { color: var(--green-dark); font-family: 'ZCOOL XiaoWei', serif; font-style: normal; font-weight: 400; letter-spacing: -.02em; }
+      .typewriter-line { white-space: nowrap; }
+      .typewriter-line:last-child::after { display: inline-block; width: 3px; height: .82em; margin-left: 8px; border-radius: 2px; background: var(--green); content: ''; vertical-align: -.06em; animation: caret-blink .85s step-end infinite; }
+      @keyframes caret-blink { 50% { opacity: 0; } }
+      .inspiration { margin: 28px 0 0; color: var(--green-dark); font-family: 'ZCOOL XiaoWei', serif; font-size: 19px; letter-spacing: .04em; }
+      .inspiration span { display: inline-block; margin: 0 5px; color: #9ac5a7; font-family: 'Noto Sans SC', sans-serif; }
+      .hero-description { max-width: 430px; margin: 16px 0 32px; color: var(--muted); font-size: 16px; line-height: 1.9; }
+      .download-button { display: inline-flex; align-items: center; gap: 18px; padding: 16px 21px 16px 25px; border-radius: 14px; color: white; background: var(--green-dark); box-shadow: 0 14px 28px rgba(47, 118, 80, .2); font-size: 15px; font-weight: 700; transition: transform .25s ease, box-shadow .25s ease, background .25s ease; }
+      .download-button:hover { background: #256440; box-shadow: 0 17px 32px rgba(47, 118, 80, .28); transform: translateY(-3px); }
+      .download-button:focus-visible { outline: 3px solid rgba(75, 157, 112, .35); outline-offset: 4px; }
+      .download-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+
+      .app-preview { position: relative; display: grid; place-items: center; min-height: 400px; transform: translate3d(0, var(--scroll-shift, 0px), 0); will-change: transform; }
+      .preview-glow { position: absolute; width: 320px; height: 320px; border-radius: 50%; background: rgba(182, 224, 194, .46); filter: blur(3px); }
+      .icon-card { position: relative; width: min(290px, 65vw); aspect-ratio: 1; padding: 22px; border: 12px solid rgba(255, 255, 255, .66); border-radius: 72px; background: #fff; box-shadow: 0 28px 60px rgba(65, 112, 82, .18), 0 2px 5px rgba(65, 112, 82, .08); transform: rotate(4deg); transition: transform .35s ease; }
+      .icon-card:hover { transform: rotate(0deg) scale(1.03); }
+      .icon-card img { width: 100%; height: 100%; display: block; border-radius: 52px; object-fit: cover; }
+      .float-card { position: absolute; display: flex; align-items: center; gap: 9px; padding: 12px 15px; border: 1px solid rgba(255, 255, 255, .8); border-radius: 13px; color: #557166; background: rgba(255,255,255,.78); box-shadow: 0 12px 28px rgba(55, 99, 70, .1); backdrop-filter: blur(12px); font-size: 12px; font-weight: 600; }
+      .float-card-top { top: 62px; right: 1%; }
+      .float-card-bottom { bottom: 49px; left: 0; }
+      .float-dot { width: 7px; height: 7px; border-radius: 50%; background: #70c28c; box-shadow: 0 0 0 4px #e1f3e5; }
+      .check-mark { display: grid; place-items: center; width: 19px; height: 19px; border-radius: 50%; color: white; background: #72bf8a; font-size: 12px; }
+
+      .intro-section { display: grid; grid-template-columns: .8fr 1.2fr; gap: 100px; padding: 88px 40px 110px; border-top: 1px solid rgba(158, 195, 169, .4); }
+      [data-reveal] { opacity: 0; transform: translate3d(0, 24px, 0); transition: opacity .55s ease, transform .55s ease; }
+      [data-reveal].is-visible { opacity: 1; transform: translate3d(0, 0, 0); }
+      .intro-section h2 { font-size: clamp(32px, 4vw, 48px); }
+      .intro-content { max-width: 610px; color: #5d756a; font-size: 15px; line-height: 1.95; }
+      .intro-content p { margin: 0 0 20px; }
+      code { padding: 3px 6px; border-radius: 5px; color: var(--green-dark); background: #e4f2e7; font-family: 'SFMono-Regular', Consolas, monospace; font-size: .88em; }
+      .audience-block { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+      .audience-title { margin-bottom: 12px !important; color: var(--ink); font-weight: 700; }
+      ul { margin: 0; padding: 0; list-style: none; }
+      li { position: relative; margin: 10px 0; padding-left: 23px; }
+      li::before { content: ''; position: absolute; top: .72em; left: 0; width: 7px; height: 7px; border-radius: 50%; background: #82c798; }
+      .footer { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 23px 40px 30px; border-top: 1px solid rgba(158, 195, 169, .4); color: #8ba095; font-size: 11px; letter-spacing: .03em; text-align: center; }
+      .footer p { margin: 0; }
+      .footer p:last-child { color: #a5b7ad; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .app-preview { transform: none; }
+        [data-reveal] { opacity: 1; transform: none; transition: none; }
+        .typewriter-line:last-child::after { animation: none; }
+      }
+
+      @media (max-width: 720px) {
+        .topbar { padding: 24px 22px; }
+        .topbar-note { display: none; }
+        .hero { grid-template-columns: 1fr; gap: 45px; min-height: auto; padding: 65px 22px 80px; }
+        .hero-copy { text-align: center; }
+        .eyebrow { justify-content: center; }
+        .hero-description { margin: 24px auto 28px; font-size: 14px; }
+        .app-preview { min-height: 320px; }
+        .icon-card { width: min(245px, 64vw); border-width: 9px; border-radius: 55px; padding: 17px; }
+        .icon-card img { border-radius: 40px; }
+        .float-card-top { top: 26px; right: 2%; }
+        .float-card-bottom { bottom: 18px; left: 1%; }
+        .intro-section { grid-template-columns: 1fr; gap: 32px; padding: 66px 22px 74px; }
+        .section-heading .eyebrow { justify-content: flex-start; }
+        .intro-content { font-size: 14px; }
+        .footer { align-items: center; flex-direction: column; gap: 8px; padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <div class="ambient ambient-one" aria-hidden="true"></div>
+      <div class="ambient ambient-two" aria-hidden="true"></div>
+
+      <nav class="topbar" aria-label="页面导航">
+        <a class="brand" href="./" aria-label="MD轻页首页">
+          <span class="brand-mark">M</span>
+          <span>MD轻页</span>
+        </a>
+        <span class="topbar-note">专注写作，轻装上阵</span>
+      </nav>
+
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span>为手机而生的 Markdown 编辑器</p>
+          <h1 id="hero-title" aria-label="把想法写下来，简单到刚刚好。"><span class="typewriter-line" data-typewriter="把想法写下来，"></span><br /><em class="typewriter-line" data-typewriter="简单到刚刚好。"></em></h1>
+          <p class="inspiration">一页纸，折成飞机 <span>—</span> 文档轻到可以飞</p>
+          <p class="hero-description">打开即写，自动保存。让每一次记录都保持轻盈，让重要的文字始终在你手边。</p>
+          <!-- 下载链接：如需更换地址，请修改下面 href 中的 APK 地址。 -->
+          <a class="download-button" href="https://img.watech.top/MD轻页/mdqy-4.7.1.apk" download>
+            <span>立即下载</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14" /></svg>
+          </a>
+        </div>
+
+        <div class="app-preview" aria-label="MD轻页应用图标" data-scroll-layer>
+          <div class="preview-glow"></div>
+          <div class="icon-card">
+            <img src="./public/mmexport1794110713676.jpg" alt="MD轻页应用图标" />
+          </div>
+          <div class="float-card float-card-top"><span class="float-dot"></span>自动保存中</div>
+          <div class="float-card float-card-bottom"><span class="check-mark">✓</span>随时随地，安心记录</div>
+        </div>
+      </section>
+
+      <section class="intro-section" aria-labelledby="intro-title">
+        <div class="section-heading" data-reveal>
+          <p class="eyebrow">关于 MD轻页</p>
+          <h2 id="intro-title">安静、可靠，<br />把选择权交还给你。</h2>
+        </div>
+        <div class="intro-content" data-reveal>
+          <p>MD轻页是一款为手机而生的轻量 Markdown 编辑器。你只需要指定一个文件夹，所有 <code>.md</code> 文档都保存在那里——打开即写、自动保存，分屏实时预览，常用排版收在一条顺手的长按快捷栏里。</p>
+          <p>它不要求登录，不塞广告，也没有内购和功能锁。需要换手机时，可以用本地备份，或按需开启云端同步；日常写作、代码笔记、读书摘录、待办清单，都可以安静地留在本机。</p>
+          <div class="audience-block">
+            <p class="audience-title">适合这样的人</p>
+            <ul>
+              <li>想在手机上快速记 Markdown，而不是背语法的人</li>
+              <li>习惯把文档放在自己文件夹里，希望数据可控的人</li>
+              <li>需要一个轻量、无干扰、能长期使用的写作工具的人</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span class="footer-line"></span>
+        <p>Copyright © 2026 水车 · MD轻页</p>
+        <p>Made for thoughtful writing</p>
+      </footer>
+    </main>
+
+    <script>
+      const scrollLayer = document.querySelector('[data-scroll-layer]')
+      let scrollFrame = 0
+
+      const updateScrollLayer = () => {
+        scrollFrame = 0
+        const distanceFromCenter = window.innerHeight / 2 - scrollLayer.getBoundingClientRect().top
+        const offset = Math.max(-18, Math.min(18, distanceFromCenter * 0.035))
+        scrollLayer.style.setProperty('--scroll-shift', `${offset}px`)
+      }
+
+      window.addEventListener('scroll', () => {
+        if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateScrollLayer)
+      }, { passive: true })
+
+      updateScrollLayer()
+
+      const revealItems = document.querySelectorAll('[data-reveal]')
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            revealObserver.unobserve(entry.target)
+          }
+        })
+      }, { threshold: 0.18 })
+
+      revealItems.forEach((item) => revealObserver.observe(item))
+
+      const typewriterLines = document.querySelectorAll('[data-typewriter]')
+      const typeText = (element, text, index = 0) => {
+        if (index < text.length) {
+          element.textContent += text[index]
+          window.setTimeout(() => typeText(element, text, index + 1), 140)
+        }
+      }
+
+      typewriterLines.forEach((line, index) => {
+        window.setTimeout(() => typeText(line, line.dataset.typewriter), index * 520)
+      })
+    </script>
+  </body>
+</html>
